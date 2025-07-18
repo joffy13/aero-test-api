@@ -3,8 +3,12 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
+  Put,
   Query,
+  Req,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -15,6 +19,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserId } from 'src/common/decorators/user-id.decorator';
 import { File } from './entities/file.entity';
 import { GetUserFiles } from './dto/get-user-files.dto';
+import { Response } from 'express';
 
 @Controller('file')
 export class FileController {
@@ -37,9 +42,33 @@ export class FileController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('/:id')
+  async info(@Param('id') id: string) {
+    return this.fileService.getFileById(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Delete('delete/:id')
   async delete(@Param('id') id: string) {
     await this.fileService.deleteFileById(id);
     return { message: 'File deleted successfully' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('download/:id')
+  async download(@Param('id') id: string, @Res() res: Response) {
+    const path = await this.fileService.downloadFile(id);
+    console.log(path);
+    res.download(path);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  @Put('update/:id')
+  async update(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.fileService.updateFile(id, file);
   }
 }

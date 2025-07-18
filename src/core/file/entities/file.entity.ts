@@ -27,7 +27,7 @@ export class File {
   @Column()
   url: string;
 
-  @Column({ nullable: true })
+  @Column()
   path: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })

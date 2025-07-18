@@ -5,5 +5,5 @@ export interface IFileUploadeResponse {
 
 export interface IFileUploader {
   upload(file: Express.Multer.File): Promise<IFileUploadeResponse>;
-  delete(path: string): Promise<void>;
+  delete(url: string): Promise<void>;
 }

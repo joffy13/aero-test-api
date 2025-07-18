@@ -33,18 +33,16 @@ export class LocalUploadStrategy implements IFileUploader {
       await fs.writeFile(fullPath, file.buffer);
       return {
         url: `${APP_URL}/uploads/${fileName}`,
-        path: `/uploads/${fileName}`,
+        path: `uploads/${fileName}`,
       };
     } catch (err) {
       console.error('File write error:', err);
       throw new InternalServerErrorException('Failed to save file');
     }
   }
-  async delete(filePath: string): Promise<void> {
-    const absolutePath = path.join(process.cwd(), filePath);
-
+  async delete(url: string): Promise<void> {
     try {
-      await fs.unlink(absolutePath);
+      await fs.unlink(url);
     } catch (err) {
       if (err.code !== 'ENOENT') {
         throw new InternalServerErrorException(

@@ -17,12 +17,13 @@ export class FileService {
 
   async upload(file: Express.Multer.File, userId: string) {
     const uploadResponse = await this.fileUploader.upload(file);
+    const parsed = path.parse(file.originalname);
     const upload = this.fileRepository.create({
-      name: path.parse(file.originalname).name,
+      name: parsed.name,
+      extension: parsed.ext.slice(1),
       url: uploadResponse.url,
-      path: uploadResponse.path,
+      path: uploadResponse.path || '',
       mimeType: file.mimetype,
-      extension: path.parse(file.originalname).ext.slice(1),
       size: file.size,
       userId,
     });
@@ -52,9 +53,40 @@ export class FileService {
     if (!upload) {
       throw new NotFoundException('File not found');
     }
-    await this.fileUploader.delete(upload.path);
+    await this.fileUploader.delete(upload.url);
 
     await this.fileRepository.delete(id);
     return;
+  }
+
+  async getFileById(id: string) {
+    const file = await this.fileRepository.findOne({ where: { id } });
+    if (!file) {
+      throw new NotFoundException('File not found');
+    }
+    return file;
+  }
+
+  async downloadFile(id: string) {
+    const file = await this.getFileById(id);
+    return path.resolve(process.cwd(), file.path);
+  }
+
+  async updateFile(id: string, newFile: Express.Multer.File) {
+    const existing = await this.getFileById(id);
+
+    await this.fileUploader.delete(existing.url);
+
+    const savedPath = await this.fileUploader.upload(newFile);
+    const parsed = path.parse(newFile.originalname);
+
+    existing.name = parsed.name;
+    existing.extension = parsed.ext.slice(1);
+    existing.mimeType = newFile.mimetype;
+    existing.size = newFile.size;
+    existing.path = savedPath.path || '';
+    existing.url = savedPath.url;
+
+    return this.fileRepository.save(existing);
   }
 }
