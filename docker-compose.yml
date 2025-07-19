@@ -19,7 +19,7 @@ services:
     command: npm run start
   mysql:
     image: mysql:8.0
-    container_name: erp-auth-db
+    container_name: erp-aero-db
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}

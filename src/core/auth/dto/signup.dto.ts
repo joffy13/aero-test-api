@@ -7,10 +7,6 @@ export class SignupDto implements ICreateUser {
   @IsEmailOrPhone({ message: 'id must be phone number or email' })
   id: string;
 
-  @IsStrongPassword({
-    minLength: 8,
-    minSymbols: 1,
-    minUppercase: 1,
-  })
+  @IsNotEmpty()
   password: string;
 }

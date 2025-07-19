@@ -23,7 +23,6 @@ export class AuthService {
     const salt = await bcrypt.genSalt(8);
     const password = await bcrypt.hash(dto.password, salt);
     const user = await this.userService.create({ ...dto, password });
-    console.log(user);
     return this.generateTokens(user.id);
   }
 

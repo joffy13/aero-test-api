@@ -30,7 +30,6 @@ export class FileService {
 
   async listUploads(userId: string, query: GetUserFiles) {
     const { list_size = 10, page = 1 } = query;
-    console.log(userId);
     const [items, total] = await this.fileRepository.findAndCount({
       where: { userId: userId },
       order: { uploadedAt: 'DESC' },

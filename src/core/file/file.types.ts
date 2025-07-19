@@ -1,6 +1,6 @@
 export interface IFileUploadeResponse {
   url: string;
-  path?: string;
+  path: string;
 }
 
 export interface IFileUploader {

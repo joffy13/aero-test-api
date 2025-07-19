@@ -20,13 +20,22 @@ import { UserId } from 'src/common/decorators/user-id.decorator';
 import { File } from './entities/file.entity';
 import { GetUserFiles } from './dto/get-user-files.dto';
 import { Response } from 'express';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+} from '@nestjs/swagger';
+import { ApiFile } from 'src/common/decorators/api-file-decorator';
 
+@ApiBearerAuth()
 @Controller('file')
 export class FileController {
   constructor(private readonly fileService: FileService) {}
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
+  @ApiFile()
   @Post('upload')
   async upload(
     @UploadedFile() file: Express.Multer.File,
@@ -58,12 +67,12 @@ export class FileController {
   @Get('download/:id')
   async download(@Param('id') id: string, @Res() res: Response) {
     const path = await this.fileService.downloadFile(id);
-    console.log(path);
     res.download(path);
   }
 
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor('file'))
+  @ApiFile()
   @Put('update/:id')
   async update(
     @Param('id') id: string,
